@@ -1,5 +1,4 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
-#requires -version 6.2
 
 function Import-AzSentinelAlertRule {
     <#
@@ -177,6 +176,8 @@ function Import-AzSentinelAlertRule {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
             }
 
+            return ($body | ConvertTo-Csv | ConvertFrom-Csv | ConvertTo-Json -Depth 10)
+
 
             if ($content) {
 
@@ -187,7 +188,7 @@ function Import-AzSentinelAlertRule {
                     $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName, incidentConfiguration, queryResultsAggregationSettings) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName, incidentConfiguration, queryResultsAggregationSettings)
                 }
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Csv | ConvertFrom-Csv | ConvertTo-Json -Depth 10 )
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
                         New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
@@ -213,7 +214,7 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Csv | ConvertFrom-Csv | ConvertTo-Json -Depth 10)
                     if ($body.Properties.playbookName) {
                         New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
                     }

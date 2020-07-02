@@ -33,7 +33,7 @@
     Description          = 'PowerShell module for Azure Sentinel'
 
     # Minimum version of the PowerShell engine required by this module
-    PowerShellVersion    = '6.2'
+    #PowerShellVersion    = '6.2'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
